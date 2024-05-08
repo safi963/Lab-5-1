@@ -1,32 +1,26 @@
-# Use a base image with Python 3.9
 FROM python:3.9-slim
 
-# Install system dependencies
-RUN apt-get clean && apt-get -y update && \
-    apt-get -y install nginx python3-dev build-essential nfs-common && \
-    rm -rf /var/lib/apt/lists/*
+# Install dependencies
+RUN apt-get clean && apt-get -y update && apt-get -y install nginx python3-dev build-essential nfs-common && rm -rf /var/lib/apt/lists/*
 
-# Create a mount point for the database
+# Install static code analysis tools
+RUN pip install pylint flake8
+
+# Create mount point for NFS
 RUN mkdir -p /nfs
 
-# Copy the SQLite database file to the mount point
 COPY /data/demo.db /nfs
 
-# Set the working directory in the container
-WORKDIR /app
-
-# Copy the application files to the container
+# Copy application files
 COPY . .
 
 # Install Python dependencies
 RUN pip install -r requirements1.txt
 
-# Expose port 5000 for the Flask application
+# Expose port 5000 for the application
 EXPOSE 5000
 
-# Copy the Nginx configuration file
-COPY nginx.conf /etc/nginx/nginx.conf
+# Command to run the application
+CMD ["python3", "main.py"]
 
-# Command to start Nginx and the Flask application
-CMD ["bash", "-c", "service nginx start && python3 main.py"]
 
