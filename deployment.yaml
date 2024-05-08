@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: flask-dev-deployment
+  name: flask-prod-deployment
   labels:
     app: flask
 spec:
@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: flask
-          image: cithit/wanes:latest    #your MiamiID
+          image: cithit/roseaw:latest
           ports:
             - containerPort: 5000
           volumeMounts:
@@ -25,4 +25,4 @@ spec:
       volumes:
         - name: nfs-storage
           persistentVolumeClaim:
-            claimName: flask-pvc
+            claimName: flask-pvc 
