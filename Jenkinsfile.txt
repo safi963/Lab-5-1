@@ -9,14 +9,20 @@ pipeline {
         KUBECONFIG = credentials('wanes-225')   // Change this to match your Kubernetes credentials (MiamiID-225)! 
     }
 
-    stages {
-        stage('Code Checkout') {
-            steps {
-                cleanWs()
-                checkout([$class: 'GitSCM', branches: [[name: '*/main']],
-                          userRemoteConfigs: [[url: "${GITHUB_URL}"]]])
+   stages {
+    // Previous stages...
+
+    stage('Static Code Analysis') {
+        steps {
+            script {
+                sh 'pip install pylint'
+                sh 'pylint your_python_file.py'
             }
         }
+    }
+
+    // Other stages...
+}
 
         stage('Build Docker Image') {
             steps {
