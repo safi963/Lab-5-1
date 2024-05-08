@@ -3,9 +3,6 @@ FROM python:3.9-slim
 # Install dependencies
 RUN apt-get clean && apt-get -y update && apt-get -y install nginx python3-dev build-essential nfs-common && rm -rf /var/lib/apt/lists/*
 
-# Install static code analysis tools
-RUN pip install pylint flake8
-
 # Create mount point for NFS
 RUN mkdir -p /nfs
 
@@ -21,6 +18,6 @@ RUN pip install -r requirements1.txt
 EXPOSE 5000
 
 # Command to run the application
-CMD ["python3", "main.py"]
+CMD ["python3", "main.py"] 
 
 
