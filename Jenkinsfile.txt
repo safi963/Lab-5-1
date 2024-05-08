@@ -3,10 +3,10 @@ pipeline {
 
     environment {
         DOCKER_CREDENTIALS_ID = 'roseaw-dockerhub'  
-        DOCKER_IMAGE = 'cithit/wanes'   // Change this to your MiamiID!
+        DOCKER_IMAGE = 'cithit/taylo271'                                   //<-----change this to your MiamiID!
         IMAGE_TAG = "build-${BUILD_NUMBER}"
-        GITHUB_URL = 'https://github.com/safi963/https-github.com-miamioh-cit-225-lab4-2.git'   // Change this to match your repository!
-        KUBECONFIG = credentials('wanes-225')   // Change this to match your Kubernetes credentials (MiamiID-225)! 
+        GITHUB_URL = 'https://github.com/miamiohTaylo271/225-5.1.git'     //<-----change this to match this new repository!
+        KUBECONFIG = credentials('taylo271-225')                           //<-----change this to match your kubernetes credentials (MiamiID-225)! 
     }
 
     stages {
@@ -51,15 +51,19 @@ pipeline {
         stage('Generate Test Data') {
             steps {
                 script {
-                    // Add steps to generate test data if needed
+                // Ensure the label accurately targets the correct pods.
+                def appPod = sh(script: "kubectl get pods -l app=flask -o jsonpath='{.items[0].metadata.name}'", returnStdout: true).trim()
+                // Execute command within the pod. 
+                sh "kubectl get pods"
+                sh "sleep 5"
+                sh "kubectl exec ${appPod} -- python3 data-gen.py"
                 }
             }
-        }
+    }
 
         stage("Run Acceptance Tests") {
             steps {
                 script {
-                    // Add or modify steps to run acceptance tests
                     sh 'docker stop qa-tests || true'
                     sh 'docker rm qa-tests || true'
                     sh 'docker build -t qa-tests -f Dockerfile.test .'
@@ -71,7 +75,7 @@ pipeline {
         stage('Remove Test Data') {
             steps {
                 script {
-                    // Add or modify steps to remove test data
+                    // Run the python script to generate data to add to the database
                     def appPod = sh(script: "kubectl get pods -l app=flask -o jsonpath='{.items[0].metadata.name}'", returnStdout: true).trim()
                     sh "kubectl exec ${appPod} -- python3 data-clear.py"
                 }
@@ -81,7 +85,6 @@ pipeline {
         stage('Check Kubernetes Cluster') {
             steps {
                 script {
-                    // Add or modify steps to check Kubernetes cluster status
                     sh "kubectl get all"
                 }
             }
@@ -89,23 +92,15 @@ pipeline {
     }
 
     post {
+
         success {
-            script {
-                slackSend(color: "good", message: "Build Completed: ${env.JOB_NAME} ${env.BUILD_NUMBER}")
-            }
+            slackSend color: "good", message: "Build Completed: ${env.JOB_NAME} ${env.BUILD_NUMBER}"
         }
         unstable {
-            script {
-                slackSend(color: "warning", message: "Build Completed: ${env.JOB_NAME} ${env.BUILD_NUMBER}")
-            }
+            slackSend color: "warning", message: "Build Completed: ${env.JOB_NAME} ${env.BUILD_NUMBER}"
         }
         failure {
-            script {
-                slackSend(color: "danger", message: "Build Completed: ${env.JOB_NAME} ${env.BUILD_NUMBER}")
-            }
+            slackSend color: "danger", message: "Build Completed: ${env.JOB_NAME} ${env.BUILD_NUMBER}"
         }
     }
 }
-
-
-
