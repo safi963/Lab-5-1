@@ -5,8 +5,8 @@ pipeline {
         DOCKER_CREDENTIALS_ID = 'roseaw-dockerhub'  
         DOCKER_IMAGE = 'cithit/wanes'   // Change this to your MiamiID!
         IMAGE_TAG = "build-${BUILD_NUMBER}"
-        GITHUB_URL = 'https://github.com/safi963/https-github.com-miamioh-cit-225-lab4-2.git'   // Change this to match your repository!
-        KUBECONFIG = credentials('wanes-225')   // Change this to match your Kubernetes credentials (wanes-225)! 
+        GITHUB_URL = 'https://github.com/safi963/Lab-5-1.git'   // Change this to match your repository!
+        KUBECONFIG = credentials('wanes-225')   // Change this to match your Kubernetes credentials (MiamiID-225)! 
     }
 
     stages {
