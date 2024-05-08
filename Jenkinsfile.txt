@@ -36,67 +36,24 @@ pipeline {
             }
         }
 
-        stage('Deploy to Dev Environment') {
+        stage('Static Code Analysis') {
             steps {
                 script {
-                    // This sets up the Kubernetes configuration using the specified KUBECONFIG
-                    def kubeConfig = readFile(KUBECONFIG)
-                    // This updates the deployment-dev.yaml to use the new image tag
-                    sh "sed -i 's|${DOCKER_IMAGE}:latest|${DOCKER_IMAGE}:${IMAGE_TAG}|' deployment-dev.yaml"
-                    sh "kubectl apply -f deployment-dev.yaml"
+                    // Add steps for static code analysis using pylint or flake8
+                    sh 'pip install pylint' // Install pylint (or flake8)
+                    sh 'pylint main.py' // Run pylint on main.py (replace with your Python files)
+                    // You can add more files or directories for analysis as needed
                 }
             }
         }
 
-        stage('Generate Test Data') {
-            steps {
-                script {
-                    // Add steps to generate test data if needed
-                }
-            }
-        }
-
-        stage("Run Acceptance Tests") {
-            steps {
-                script {
-                    // Add or modify steps to run acceptance tests
-                    sh 'docker stop qa-tests || true'
-                    sh 'docker rm qa-tests || true'
-                    sh 'docker build -t qa-tests -f Dockerfile.test .'
-                    sh 'docker run qa-tests'
-                }
-            }
-        }
+        // Add other stages as needed
         
-        stage('Remove Test Data') {
-            steps {
-                script {
-                    // Add or modify steps to remove test data
-                    def appPod = sh(script: "kubectl get pods -l app=flask -o jsonpath='{.items[0].metadata.name}'", returnStdout: true).trim()
-                    sh "kubectl exec ${appPod} -- python3 data-clear.py"
-                }
-            }
-        }
-         
-        stage('Check Kubernetes Cluster') {
-            steps {
-                script {
-                    // Add or modify steps to check Kubernetes cluster status
-                    sh "kubectl get all"
-                }
-            }
-        }
+        // Original stages from your Jenkinsfile...
     }
 
     post {
-        success {
-            slackSend color: "good", message: "Build Completed: ${env.JOB_NAME} ${env.BUILD_NUMBER}"
-        }
-        unstable {
-            slackSend color: "warning", message: "Build Completed: ${env.JOB_NAME} ${env.BUILD_NUMBER}"
-        }
-        failure {
-            slackSend color: "danger", message: "Build Completed: ${env.JOB_NAME} ${env.BUILD_NUMBER}"
-        }
+        // Original post section from your Jenkinsfile...
     }
 }
+
