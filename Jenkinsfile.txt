@@ -18,16 +18,6 @@ pipeline {
             }
         }
 
-        stage('Static Code Analysis') {
-            steps {
-                script {
-                    // Run static code analysis using pylint or flake8
-                    sh 'pylint *.py || true'  // Example command for pylint
-                    // Add similar commands for other static analysis tools if needed
-                }
-            }
-        }
-
         stage('Build Docker Image') {
             steps {
                 script {
@@ -49,8 +39,10 @@ pipeline {
         stage('Deploy to Dev Environment') {
             steps {
                 script {
-                    // Deployment to development environment (DEV)
+                    // This sets up the Kubernetes configuration using the specified KUBECONFIG
                     def kubeConfig = readFile(KUBECONFIG)
+                    // This updates the deployment-dev.yaml to use the new image tag
+                    sh "sed -i 's|${DOCKER_IMAGE}:latest|${DOCKER_IMAGE}:${IMAGE_TAG}|' deployment-dev.yaml"
                     sh "kubectl apply -f deployment-dev.yaml"
                 }
             }
@@ -81,6 +73,39 @@ pipeline {
                 script {
                     // Add or modify steps to remove test data
                     def appPod = sh(script: "kubectl get pods -l app=flask -o jsonpath='{.items[0].metadata.name}'", returnStdout: true).trim()
-                    sh "kubectl exec ${appPod} -- python
+                    sh "kubectl exec ${appPod} -- python3 data-clear.py"
+                }
+            }
+        }
+         
+        stage('Check Kubernetes Cluster') {
+            steps {
+                script {
+                    // Add or modify steps to check Kubernetes cluster status
+                    sh "kubectl get all"
+                }
+            }
+        }
+    }
+
+    post {
+        success {
+            script {
+                slackSend(color: "good", message: "Build Completed: ${env.JOB_NAME} ${env.BUILD_NUMBER}")
+            }
+        }
+        unstable {
+            script {
+                slackSend(color: "warning", message: "Build Completed: ${env.JOB_NAME} ${env.BUILD_NUMBER}")
+            }
+        }
+        failure {
+            script {
+                slackSend(color: "danger", message: "Build Completed: ${env.JOB_NAME} ${env.BUILD_NUMBER}")
+            }
+        }
+    }
+}
+
 
 
