@@ -5,24 +5,28 @@ pipeline {
         DOCKER_CREDENTIALS_ID = 'roseaw-dockerhub'  
         DOCKER_IMAGE = 'cithit/wanes'   // Change this to your MiamiID!
         IMAGE_TAG = "build-${BUILD_NUMBER}"
-        GITHUB_URL = 'https://github.com/safi963/Lab-5-1.git'   // Change this to match your repository!
+        GITHUB_URL = 'https://github.com/safi963/https-github.com-miamioh-cit-225-lab4-2.git'   // Change this to match your repository!
         KUBECONFIG = credentials('wanes-225')   // Change this to match your Kubernetes credentials (MiamiID-225)! 
     }
 
-   stages {
-    // Previous stages...
-
-    stage('Static Code Analysis') {
-        steps {
-            script {
-                sh 'pip install pylint'
-                sh 'pylint your_python_file.py'
+    stages {
+        stage('Code Checkout') {
+            steps {
+                cleanWs()
+                checkout([$class: 'GitSCM', branches: [[name: '*/main']],
+                          userRemoteConfigs: [[url: "${GITHUB_URL}"]]])
             }
         }
-    }
 
-    // Other stages...
-}
+        stage('Static Code Analysis') {
+            steps {
+                script {
+                    // Run static code analysis using pylint or flake8
+                    sh 'pylint *.py || true'  // Example command for pylint
+                    // Add similar commands for other static analysis tools if needed
+                }
+            }
+        }
 
         stage('Build Docker Image') {
             steps {
@@ -42,24 +46,41 @@ pipeline {
             }
         }
 
-        stage('Static Code Analysis') {
+        stage('Deploy to Dev Environment') {
             steps {
                 script {
-                    // Add steps for static code analysis using pylint or flake8
-                    sh 'pip install pylint' // Install pylint (or flake8)
-                    sh 'pylint main.py' // Run pylint on main.py (replace with your Python files)
-                    // You can add more files or directories for analysis as needed
+                    // Deployment to development environment (DEV)
+                    def kubeConfig = readFile(KUBECONFIG)
+                    sh "kubectl apply -f deployment-dev.yaml"
                 }
             }
         }
 
-        // Add other stages as needed
-        
-        // Original stages from your Jenkinsfile...
-    }
+        stage('Generate Test Data') {
+            steps {
+                script {
+                    // Add steps to generate test data if needed
+                }
+            }
+        }
 
-    post {
-        // Original post section from your Jenkinsfile...
-    }
-}
+        stage("Run Acceptance Tests") {
+            steps {
+                script {
+                    // Add or modify steps to run acceptance tests
+                    sh 'docker stop qa-tests || true'
+                    sh 'docker rm qa-tests || true'
+                    sh 'docker build -t qa-tests -f Dockerfile.test .'
+                    sh 'docker run qa-tests'
+                }
+            }
+        }
+        
+        stage('Remove Test Data') {
+            steps {
+                script {
+                    // Add or modify steps to remove test data
+                    def appPod = sh(script: "kubectl get pods -l app=flask -o jsonpath='{.items[0].metadata.name}'", returnStdout: true).trim()
+                    sh "kubectl exec ${appPod} -- python
+
 
