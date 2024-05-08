@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: flask
-          image: cithit/roseaw:latest
+          image: cithit/wanes:latest    #your MiamiID
           ports:
             - containerPort: 5000
           volumeMounts:
@@ -25,4 +25,4 @@ spec:
       volumes:
         - name: nfs-storage
           persistentVolumeClaim:
-            claimName: flask-pvc 
+            claimName: flask-pvc   
