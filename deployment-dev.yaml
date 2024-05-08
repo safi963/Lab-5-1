@@ -11,7 +11,7 @@ spec:
   accessModes:
     - ReadWriteMany
   nfs:
-    path:  /srv/nfs/hendris3
+    path:  /srv/nfs/wanes
     server: 10.48.10.140
   persistentVolumeReclaimPolicy: Retain
 
@@ -47,7 +47,7 @@ spec:
     spec:
       containers:
         - name: api-container-dev
-          image: cithit/hendris3:latest
+          image: cithit/wanes:latest
           ports:
             - containerPort: 5000
           volumeMounts:
