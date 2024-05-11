@@ -1,43 +1,30 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <title>Database Table</title>
-    <style>
-        table {
-            border-collapse: collapse;
-            width: 100%;
-        }
-        th, td {
-            border: 1px solid black;
-            padding: 8px;
-            text-align: left;
-        }
-        th {
-            background-color: #f2f2f2;
-        }
-        tr:hover {
-            background-color: #f5f5f5;
-        }
-    </style>
+    <title>Matching Game</title>
 </head>
 <body>
-    <h1>Database Table Contents</h1>
-    <table>
-        <thead>
+    <h2>Matching Game</h2>
+    <h3>(Mixed Up Name & Number Combinations Below</h3>
+    <table border="1">
+        <tr>
+            <th>Name</th>
+            <th>Number</th>
+        </tr>
+        {% for name, number in data %}
             <tr>
-                <th>ID</th>
-                <th>Data</th>
+                <td>{{ name }}</td>
+                <td>{{ number }}</td>
             </tr>
-        </thead>
-        <tbody>
-            {% for row in rows %}
-            <tr>
-                <td>{{ row[0] }}</td>
-                <td>{{ row[1] }}</td>
-            </tr>
-            {% endfor %}
-        </tbody>
+        {% endfor %}
     </table>
+    <h2>Guess The Correct Name to The Corresponding Number</h2>
+    <form method="POST" action="/check-guess">
+        <label for="guess_name">Name:</label><br>
+        <input type="text" id="guess_name" name="guess_name" required><br>
+        <label for="guess_number">Number:</label><br>
+        <input type="text" id="guess_number" name="guess_number" required><br><br>
+        <input type="submit" value="Submit Guess">
+    </form>
 </body>
 </html>
