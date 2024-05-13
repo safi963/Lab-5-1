@@ -2,7 +2,7 @@ from flask import Flask, request, render_template_string, redirect, url_for
 import sqlite3
 import os
 
-app = Flask(__name__) 
+app = Flask(__name__, static_folder='./templates', static_url_path='/') 
 
 # Database file path
 DATABASE = '/nfs/demo.db'
@@ -51,6 +51,7 @@ def index():
     contacts = db.execute('SELECT * FROM contacts').fetchall()
 
     # Display the HTML form along with the contacts table
+    return app.send_static_file('index.html')
     return render_template_string('''
         <!DOCTYPE html>
         <html>
