@@ -51,7 +51,6 @@ def index():
     contacts = db.execute('SELECT * FROM contacts').fetchall()
 
     # Display the HTML form along with the contacts table
-    return app.send_static_file('index.html')
     return render_template_string('''
         <!DOCTYPE html>
         <html>
