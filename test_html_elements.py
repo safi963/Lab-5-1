@@ -30,10 +30,3 @@ class TestContacts(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
-        print("Test completed successfully. All 10 test contacts were verified.")
-
-    def tearDown(self):
-        self.driver.quit()
-
-if __name__ == "__main__":
-    unittest.main()
